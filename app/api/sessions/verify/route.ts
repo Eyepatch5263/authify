@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { getSession } from '@auth0/nextjs-auth0';
-import { supabase } from '@/helpers/utils';
+import { supabase } from '@/lib/utils';
 
 export async function POST(request: Request) {
     try {
@@ -17,6 +17,7 @@ export async function POST(request: Request) {
         // get user ID from session
         const userId = session.user.sub;
 
+        // get all the device sessions for the user_id and device_id and is_active = true
         const { data: deviceSession, error } = await supabase
             .from('device_sessions')
             .select('*')
@@ -25,11 +26,13 @@ export async function POST(request: Request) {
             .eq('is_active', true)
             .maybeSingle();
 
+        // handle database error
         if (error) {
             console.error('Error verifying session:', error);
             return NextResponse.json({ error: 'Database error' }, { status: 500 });
         }
 
+        // if no active session found, return invalid with forceLoggedOut = true
         if (!deviceSession) {
             return NextResponse.json({
                 valid: false,
@@ -37,6 +40,7 @@ export async function POST(request: Request) {
                 message: 'This device has been logged out'
             });
         }
+        // update last_activity timestamp
 
         const { error: updateError } = await supabase
             .from('device_sessions')

@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { getSession } from '@auth0/nextjs-auth0';
-import { supabase } from '@/helpers/utils';
+import { supabase } from '@/lib/utils';
 
 
 export async function POST(request: Request) {
@@ -44,7 +44,7 @@ export async function POST(request: Request) {
             })
             .select()
             .single();
-        
+
         // handle insertion error
 
         if (insertError) {

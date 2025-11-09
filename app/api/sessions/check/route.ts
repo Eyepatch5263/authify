@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { getSession } from '@auth0/nextjs-auth0';
-import { supabase } from '@/helpers/utils';
+import { supabase } from '@/lib/utils';
 
 // checks the number of active device sessions for the user
 // if the number exceeds the limit, prompts the user to select a device to log out
