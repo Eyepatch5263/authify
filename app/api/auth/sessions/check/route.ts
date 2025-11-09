@@ -5,6 +5,7 @@ import { supabase } from '@/helpers/utils';
 // checks the number of active device sessions for the user
 // if the number exceeds the limit, prompts the user to select a device to log out
 // if under the limit, creates a new device session
+
 // Maximum allowed concurrent devices per user
 const MAX_DEVICES = parseInt(process.env.MAX_CONCURRENT_DEVICES || '3');
 
