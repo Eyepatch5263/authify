@@ -31,6 +31,8 @@ export function DeviceSelectionModal({ open, sessions, onCancel, onConfirm }: De
         setIsLoading(true);
         await onConfirm(selectedSession);
         setIsLoading(false);
+        // Refresh the page after logging out the selected device
+        window.location.reload();
     };
 
     // Dynamically get device icon based on device name
