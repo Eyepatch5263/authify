@@ -10,6 +10,7 @@ export function useSessionMonitor() {
 
     useEffect(() => {
         let intervalId: NodeJS.Timeout;
+        let timeoutId: NodeJS.Timeout;
 
         const checkSession = async () => {
             try {
@@ -33,11 +34,17 @@ export function useSessionMonitor() {
             }
         };
 
-        checkSession();
-        intervalId = setInterval(checkSession, 10000);
+        // Wait 2 seconds before first check to allow SessionGuard to create the session
+        timeoutId = setTimeout(() => {
+            checkSession();
+            intervalId = setInterval(checkSession, 10000);
+        }, 2000);
 
         // cleanup on unmount
         return () => {
+            if (timeoutId) {
+                clearTimeout(timeoutId);
+            }
             if (intervalId) {
                 clearInterval(intervalId);
             }
