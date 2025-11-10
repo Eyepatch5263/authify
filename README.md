@@ -1,36 +1,79 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# Project Summary - SecureAuth Multi-Device Session Management
 
-## Getting Started
+## Overview
 
-First, run the development server:
+This project is a production-ready Next.js application that implements secure multi-device authentication with Auth0 and intelligent device session management using Supabase. Users can be logged in on a maximum of 3 devices simultaneously (N=3). When attempting to login from a 4th device, users must select which existing device to force logout.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun run dev
+## Key Features Implemented
+
+### 1. Auth0 Authentication
+- Secure login/signup with Auth0
+- OAuth 2.0 / OpenID Connect
+- Session management via Auth0 SDK
+- Protected routes with server-side validation
+
+### 2. N-Device Concurrency Control (N=3)
+- Maximum 3 concurrent active sessions per user
+- Unique device fingerprinting using FingerprintJS
+- Device identification with browser and OS detection
+- Real-time session tracking in Supabase
+
+### 3. Device Selection Modal
+- Appears when 4th device attempts login
+- Shows all 3 currently active devices with:
+  - Device name (browser + OS)
+  - Last activity timestamp
+  - Visual device icons
+- User selects which device to logout
+- Cancel option to abort login
+
+### 4. Force Logout with Graceful Notification
+- Selected device immediately invalidated in database
+- Active devices check their session every 10 seconds
+- Force-logged-out devices show immediate alert:
+  - "Session Terminated" message
+  - Explanation of what happened
+  - Redirect to login page
+- No data loss or abrupt disconnection
+
+### 5. User Dashboard
+- Private page showing:
+  - Full name
+  - Email address
+  - Phone number (if provided in Auth0)
+  - Profile picture/avatar
+  - Active device sessions
+  - Current device indicator
+  - Session statistics
+
+### 6. Professional UI/UX
+- Modern, clean design with Tailwind CSS
+- shadcn/ui component library
+- Responsive layout (mobile, tablet, desktop)
+- Smooth animations and transitions
+- Loading states
+- Error handling
+- Professional color scheme (slate/neutral tones)
+
+## Technical Architecture
+
+- **Authentication**: Auth0 
+- **Database**: Supabase PostgreSQL
+- **API Routes**: Next.js API Routes
+- **Hosting**: Vercel
+
+### Database Schema
+
+**Table: device_sessions**
+```sql
+- id (uuid, primary key)
+- user_id (text, Auth0 sub)
+- device_id (text, unique fingerprint)
+- device_name (text, human-readable)
+- ip_address (text)
+- user_agent (text)
+- last_activity (timestamptz)
+- created_at (timestamptz)
+- is_active (boolean)
+- UNIQUE(user_id, device_id)
 ```
-
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
-
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
-
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
