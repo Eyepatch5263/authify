@@ -32,6 +32,30 @@ export default function Dashboard() {
     useEffect(() => {
         if (user) {
             loadActiveSessions();
+
+            // Set up real-time subscription for device_sessions changes
+            const channel = supabase
+                .channel('device_sessions_changes')
+                .on(
+                    'postgres_changes',
+                    {
+                        event: '*', // Listen to all events (INSERT, UPDATE, DELETE)
+                        schema: 'public',
+                        table: 'device_sessions',
+                        filter: `user_id=eq.${user.sub}`
+                    },
+                    (payload) => {
+                        console.log('Session change detected:', payload);
+                        // Reload sessions when any change occurs
+                        loadActiveSessions();
+                    }
+                )
+                .subscribe();
+
+            // Cleanup subscription on unmount
+            return () => {
+                supabase.removeChannel(channel);
+            };
         }
     }, [user]);
 
